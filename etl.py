@@ -1,3 +1,4 @@
+from itertools import accumulate
 import os
 import requests
 import xarray as xr
@@ -38,8 +39,33 @@ def download_merge_files(start_date, end_date):
         else:
             print(f'The file {grib_file} already exists. Skipping download.')
 
+def calculate_daily_accumulations(start_date, end_date):
+    dates = pd.date_range(start=start_date, end=end_date, freq='d')
+    daily_accumulations = []
+
+    for date in dates:
+        accumulated_prec = 0
+        for hour in range(12, 36):  # De 12z de um dia até 12z do próximo dia
+            date_time = date + timedelta(hours=hour)
+            grib_file = f'MERGE_CPTEC_{date_time.strftime("%Y%m%d%H")}.grib2'
+            path_grib_file = Path(data_dir) / grib_file
+            
+            if path_grib_file.exists():
+                df = xr.open_dataset(path_grib_file, engine='cfgrib')
+                accumulated_prec += df['prec'].sum().item()
+            else:
+                print(f"File not found: {grib_file}")
+        
+        # Adiciona o acumulado do período com intervalo de datas
+        daily_accumulations.append((date, date + timedelta(days=1), accumulated_prec))    
+    
+    return pd.DataFrame(daily_accumulations, columns=['Inicio','Fim', 'Acumulado'])
 
 inicio = '2024-09-18'
 fim = '2024-09-22'
 
 download_merge_files(inicio,fim)
+accumulated_prec=calculate_daily_accumulations(inicio,fim)
+print(accumulated_prec)
+
+
