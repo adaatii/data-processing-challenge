@@ -61,11 +61,11 @@ def calculate_daily_accumulations(start_date, end_date):
     
     return pd.DataFrame(daily_accumulations, columns=['Inicio','Fim', 'Acumulado'])
 
-inicio = '2024-09-18'
-fim = '2024-09-22'
+def validate_date_range(start_date, end_date):
+    date_range = pd.date_range(start=start_date, end=end_date)
 
-download_merge_files(inicio,fim)
-accumulated_prec=calculate_daily_accumulations(inicio,fim)
-print(accumulated_prec)
+    if len(date_range) < 5:
+        raise ValueError("The date range must cover at least 5 days.")
 
+    return pd.to_datetime(start_date), pd.to_datetime(end_date)
 
