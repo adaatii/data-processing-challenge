@@ -1,13 +1,13 @@
-from itertools import accumulate
 import os
 import requests
 import xarray as xr
 import pandas as pd
-from datetime import timedelta
+import argparse
+from datetime import datetime, timedelta
 from pathlib import Path
 
 # Directory to save the merge downloaded files
-data_dir = './data_merge'
+data_dir = Path('./data_merge')
 os.makedirs(data_dir, exist_ok=True)
 
 # Download the data
@@ -69,3 +69,11 @@ def validate_date_range(start_date, end_date):
 
     return pd.to_datetime(start_date), pd.to_datetime(end_date)
 
+def validate_date(date_str):
+    try:
+        # Tenta converter a string para um objeto datetime
+        checked_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        return checked_date
+    except ValueError:
+        # Levanta um erro se o formato não for válido
+        raise argparse.ArgumentTypeError(f"Invelid date formate: '{date_str}'. Use the YYYY-MM-DD format.")
