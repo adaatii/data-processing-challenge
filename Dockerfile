@@ -9,4 +9,4 @@ RUN mkdir -p ./output
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python", "daily_accumulations.py"]

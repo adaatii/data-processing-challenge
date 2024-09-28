@@ -13,6 +13,8 @@ if __name__ == '__main__':
     start_date = args.start
     end_date = args.end
     
+    etl.create_data_dir()
+
     try:
         start_date, end_date = etl.validate_date_range(start_date,end_date)
         etl.download_merge_files(start_date,end_date)
@@ -23,3 +25,5 @@ if __name__ == '__main__':
         daily_accumulations.to_csv(output_file, index=False)
     except ValueError as e:
         print(e)
+    finally:
+        etl.delete_data_dir()
