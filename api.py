@@ -6,7 +6,6 @@ app.config['JSON_SORT_KEYS'] = False
 
 @app.get('/teste-tecnico/datas-limite')
 def get_datas_limite():
-
     etl.create_data_dir()
 
     try:
@@ -42,8 +41,7 @@ def get_datas_limite():
         etl.delete_data_dir()
 
 @app.get('/teste-tecnico/media-bacia/obter')
-def get_watershed_mean():
-    
+def get_watershed_mean(): 
     etl.create_data_dir()
 
     try:
@@ -74,7 +72,6 @@ def get_teste():
         # Verifica se os parâmetros estão presentes
         if not start_date or not end_date:
             return jsonify({'error': 'The start_date and end_date parameters are mandatory'}), 400
-
 
         start_date, end_date = etl.validate_date_range(start_date,end_date)
         watershed_name = request.args.get('watershed_name')

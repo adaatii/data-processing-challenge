@@ -19,10 +19,10 @@ if __name__ == '__main__':
         start_date, end_date = etl.validate_date_range(start_date,end_date)
         etl.download_merge_files(start_date,end_date)
         daily_accumulations = etl.calculate_daily_accumulations(start_date,end_date)
-        print(daily_accumulations)
-
         output_file = Path(f'./output/daily_accumulations_{start_date.strftime("%Y-%m-%d")}_to_{end_date.strftime("%Y-%m-%d")}.csv')
         daily_accumulations.to_csv(output_file, index=False)
+
+        print(daily_accumulations)
     except ValueError as e:
         print(e)
     finally:
