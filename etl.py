@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 import geopandas as gpd
 import numpy as np
-import geojson
+#import geojson
 from shapely.geometry import Polygon, MultiPolygon
 import glob
 
@@ -15,31 +15,42 @@ import glob
 # Directory to save the merge downloaded files
 data_dir = Path('./data_merge')
 
-# Download the data
+# URL to download the merge files per hour
 ftp_url = 'https://ftp.cptec.inpe.br/modelos/tempo/MERGE/GPM/HOURLY/'
 
 # Directory containing the countor files
 countor_path = './contornos'
 
-# Get the GRIB2 files
-def download_merge_files(start_date, end_date):
+
+def download_merge_files_by_hour(start_date, end_date):
+    """
+    Downloads MERGE_CPTEC .grib2 files for a given date range.
+
+    Parameters:
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+        end_date (str): End date in 'YYYY-MM-DD' format.
+
+    Notes:
+        - Assumes FTP URL and data directory are defined globally.
+        - Skips downloading files that already exist.
+    """
+    # Generate hourly timestamps for the date range
     dates = pd.date_range(start=pd.to_datetime(start_date) + pd.Timedelta(hours=12), end=(pd.to_datetime(end_date) + pd.Timedelta(days=1, hours=12)), freq='h')
+
     # Download the files
     for date in dates:
+        # Define the file name and URL
         grib_file = f'MERGE_CPTEC_{date.strftime("%Y%m%d%H")}.grib2'
         grib_url = f'{ftp_url}{date.year}/{str(date.month).zfill(2)}/{str(date.day).zfill(2)}/{grib_file}'
-        path_grib_file = Path(data_dir) / grib_file
+        path_grib_file = Path(data_dir) / grib_file # Define the path to save the file
 
         if not path_grib_file.exists():
-            #print(f'Downloading file:{grib_file} from {grib_url}')
             try:
                 response = requests.get(grib_url) 
-                response.raise_for_status() # Raises an exception 
+                response.raise_for_status() # Check if the request was successful
 
                 with open(path_grib_file, 'wb') as f:
                     f.write(response.content)
-                #print(f'Finished Download: {grib_file}')
-
             except requests.exceptions.RequestException as e:
                 print(f'Failed to download  {grib_file} from {grib_url}: {e}')
             except Exception as e:
@@ -47,28 +58,35 @@ def download_merge_files(start_date, end_date):
         else:
             print(f'The file {grib_file} already exists. Skipping download.')
 
-def download_one_day(start_date):
+def download_merge_files_one_day(start_date):
+    """
+    Downloads MERGE_CPTEC .grib2 files for a given day.
+    
+    Parameters:
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+
+    Notes:
+        - Assumes FTP URL and data directory are defined globally.
+        - Skips downloading files that already exist.
+    """
     dates = pd.date_range(start=pd.to_datetime(start_date), periods=24, freq='h') 
 
     # Download the files
     for date in dates:
+        # Define the file name and URL
         grib_file = f'MERGE_CPTEC_{date.strftime("%Y%m%d%H")}.grib2'
         grib_url = f'{ftp_url}{date.year}/{str(date.month).zfill(2)}/{str(date.day).zfill(2)}/{grib_file}'
         
-        path_grib_file = Path(data_dir) / grib_file
+        path_grib_file = Path(data_dir) / grib_file # Define the path to save the file
 
-        # Verifica se ambos os arquivos existem
         if not path_grib_file.exists():
             try:
-                # Baixar o arquivo .grib2
-                #print(f'Downloading file: {grib_file} from {grib_url}')
                 response_grib = requests.get(grib_url) 
-                response_grib.raise_for_status()  # Levanta uma exceção se a requisição falhar
+                response_grib.raise_for_status() # Check if the request was successful
 
                 with open(path_grib_file, 'wb') as f:
                     f.write(response_grib.content)
-                #print(f'Finished Download: {grib_file}')
-
+                
             except requests.exceptions.RequestException as e:
                 print(f'Failed to download {grib_file}: {e}')
             except Exception as e:
@@ -76,69 +94,105 @@ def download_one_day(start_date):
         else:
             print(f'The file {grib_file} already exist. Skipping download.')
 
-def load_precipitation_data(file_path):
+def load_precipitation_data(file_path) -> xr.Dataset:
+    """
+    Loads precipitation data from a GRIB file.
+
+    Parameters:
+    file_path (str): The path to the GRIB file containing the precipitation data.
+
+    Returns:
+    xarray.Dataset: The dataset containing the loaded precipitation data.
+    """
     ds = xr.open_dataset(file_path, engine='cfgrib')
     return ds
 
-def calculate_daily_accumulations(start_date, end_date):
+def calculate_daily_accumulations(start_date, end_date) -> pd.DataFrame:
+    """
+    Calculate daily precipitation accumulations between two dates.
+
+    Parameters:
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+        end_date (str): End date in 'YYYY-MM-DD' format.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the start date, end date, and accumulated precipitation for each day in the specified date range.
+
+    Notes:
+        - The function expects the GRIB2 files to be named in the format 'MERGE_CPTEC_YYYYMMDDHH.grib2'.
+        - The function assumes that the GRIB2 files are located in a directory specified by the variable `data_dir`.
+    """
     dates = pd.date_range(start=start_date, end=end_date, freq='d')
     daily_accumulations = []
 
     for date in dates:
         accumulated_prec = 0
-        for hour in range(12, 36):  # De 12z de um dia até 12z do próximo dia
+        for hour in range(12, 36):  # 12z to 12z the next day
             date_time = date + timedelta(hours=hour)
             grib_file = f'MERGE_CPTEC_{date_time.strftime("%Y%m%d%H")}.grib2'
-            path_grib_file = Path(data_dir) / grib_file
+            grib_file_path = Path(data_dir) / grib_file
             
-            if path_grib_file.exists():
-                df = load_precipitation_data(path_grib_file)
+            if grib_file_path.exists():
+                df = load_precipitation_data(grib_file_path)
                 accumulated_prec += df['prec'].sum().item()
             else:
                 print(f"File not found: {grib_file}")
         
-        # Adiciona o acumulado do período com intervalo de datas
         daily_accumulations.append((date, date + timedelta(days=1), accumulated_prec))    
     
-    return pd.DataFrame(daily_accumulations, columns=['Inicio','Fim', 'Acumulado'])
+    return pd.DataFrame(daily_accumulations, columns=['Start','End', 'Accumulated'])
 
 def get_watershed_geometry(watershed_name):
+    """
+    Retrieves the geometry of a specified watershed from a shapefile.
+
+    Parameters:
+        watershed_name (str): The name of the watershed.
+
+    Returns:
+        shapely.geometry.polygon.Polygon: The geometry of the specified watershed.
+
+    Notes:
+        - The function assumes that the shapefile is located in a directory specified by the variable `countor_path`.
+    """
     path_countor_file = Path(countor_path) / f'{watershed_name}.shp'
+    gdf = gpd.read_file(path_countor_file)
 
-    df = gpd.read_file(path_countor_file)
+    if gdf.empty:
+        raise ValueError("The GeoDataFrame is empty. Check the shapefile.")
 
-    if df.empty:
-        raise ValueError("O GeoDataFrame está vazio. Verifique o shapefile.")
-
-    return df.geometry.iloc[0] 
+    return gdf.geometry.iloc[0] 
 
 def calculate_watershed_prec_mean(start_date, watershed_name):
-    # Geração de datas para o intervalo de 24 horas
+    """
+    Calculate the mean precipitation within a watershed over a 24-hour period.
+
+    Parameters:
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+        watershed_name (str): The name of the watershed.
+
+    Returns:
+        float: The mean precipitation within the watershed over the 24-hour period.
+
+    Notes:
+        - The function expects the GRIB2 files to be named in the format 'MERGE_CPTEC_YYYYMMDDHH.grib2'.
+        - The function assumes that the GRIB2 files are located in a directory specified by the variable `data_dir`.
+    """
     dates = pd.date_range(start=pd.to_datetime(start_date), periods=24, freq='h')
-    
+    watershed_geometry = get_watershed_geometry(watershed_name)
     total_precipitation = 0
     count = 0
 
-    # Carregar a geometria da bacia hidrográfica
-    watershed_geometry = get_watershed_geometry(watershed_name)
-
-    # Iterar sobre cada data no intervalo
-    for date in dates:
-        # Caminho para os arquivos GRIB2
-        file_pattern = Path(data_dir) / f'MERGE_CPTEC_{date.strftime("%Y%m%d%H")}*.grib2'
-        file_paths = sorted(glob.glob(str(file_pattern)))
-        #print(f"Processando arquivos para a data: {date}")
-
-        # Inicializar variáveis para acumular precipitação
+    for date in dates:       
+        grib_file = Path(data_dir) / f'MERGE_CPTEC_{date.strftime("%Y%m%d%H")}*.grib2'
+        grib_file_paths = sorted(glob.glob(str(grib_file)))
+        
         prec_accumulated = None
         lon = None
         lat = None
 
-        # Verificar se há arquivos correspondentes ao padrão
-        if file_paths:
-            # Carregar e acumular dados de precipitação de todos os arquivos GRIB2
-            for file_path in file_paths:
-                #print(f"Abrindo arquivo: {file_path}")
+        if grib_file_paths:
+            for file_path in grib_file_paths:
                 try:
                     df = load_precipitation_data(file_path)
                     prec_data = df.prec.data
@@ -153,42 +207,45 @@ def calculate_watershed_prec_mean(start_date, watershed_name):
         else:
             print("Nenhum arquivo encontrado para o padrão especificado.")
 
-        #print(f"Total de arquivos processados para {date}: {count}")
-
         if lon is not None and lat is not None:
-            # Criar uma grade de coordenadas (lon, lat)
-            lon_grid, lat_grid = np.meshgrid(lon, lat)
-            prec_flat = prec_accumulated.flatten()  # Transformando a precipitação acumulada em vetor 1D
+            lon_grid, lat_grid = np.meshgrid(lon, lat) # Create a grid of lon and lat
+            prec_flat = prec_accumulated.flatten()
 
-            # Criando DataFrame com as coordenadas e precipitação
-            lon_wgs84 = lon_grid - 360 # Convertendo para WGS84
+            lon_converted = lon_grid - 360 # Convert the longitude values to the range [-180, 180] 
 
             coords_df = pd.DataFrame({
-                'lon': lon_wgs84.flatten(),
+                'lon': lon_converted.flatten(),
                 'lat': lat_grid.flatten(),
                 'prec': prec_flat
             })            
-            # Convertendo para GeoDataFrame com o CRS correto
+     
             gdf = gpd.GeoDataFrame(coords_df, geometry=gpd.points_from_xy(coords_df.lon, coords_df.lat))
            
-            # Criar GeoDataFrame com a geometria da bacia hidrográfica
-            watershed_gdf = gpd.GeoDataFrame(geometry=[watershed_geometry], crs=gdf.crs)
-            # Filtrando precipitações dentro da bacia hidrográfica usando sjoin
-            prec_inside = gpd.sjoin(gdf, watershed_gdf, how="inner", predicate="within")
+            watershed_gdf = gpd.GeoDataFrame(geometry=[watershed_geometry])
+
+            prec_inside = gpd.sjoin(gdf, watershed_gdf, how="inner", predicate="within") # Select the points inside the watershed
             
-            # Calcular a precipitação acumulada total dentro da bacia
             total_precipitation += prec_inside['prec'].sum()
         else:
-            print("Longitude e latitude não foram carregadas corretamente.")
+            print("Longitude and latitude were not provided correctly.")
 
-    # Calcular a média da precipitação acumulada total dentro da bacia
-    median_precipitation = total_precipitation / count if count > 0 else None
-    print(f"Precipitação acumulada total dentro da bacia: {total_precipitation} mm")
-    print(f"Precipitação média acumulada total dentro da bacia: {median_precipitation} mm")
+    mean_precipitation = total_precipitation / count if count > 0 else None
+    print(f"Total accumulated precipitation within the watershed: {total_precipitation}")
+    print(f"Total mean accumulated precipitation within the watershed: {mean_precipitation}")
 
-    return median_precipitation
+    return mean_precipitation
 
-def validate_date_range(start_date, end_date):
+def validate_date_range(start_date, end_date) -> tuple[pd.Timestamp, pd.Timestamp]:
+    """
+    Validates that the date range between start_date and end_date covers at least 5 days.
+
+    Parameters:
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+        end_date (str): End date in 'YYYY-MM-DD' format.
+
+    Returns:
+        tuple: A tuple containing the start_date and end_date as pandas.Timestamp objects.
+    """
     date_range = pd.date_range(start=start_date, end=end_date)
 
     if len(date_range) < 5:
@@ -196,19 +253,32 @@ def validate_date_range(start_date, end_date):
 
     return pd.to_datetime(start_date), pd.to_datetime(end_date)
 
-def validate_date(date_str):
+def validate_date(date_str) -> datetime.date:
+    """
+    Validates and converts a date string to a date object.
+
+    Parameters:
+        date_str (str): Start date in 'YYYY-MM-DD' format.
+
+    Returns:
+        datetime.date: The validated date object.
+    """
     try:
-        # Tenta converter a string para um objeto datetime
         checked_date = datetime.strptime(date_str, '%Y-%m-%d').date()
         return checked_date
     except ValueError:
-        # Levanta um erro se o formato não for válido
-        raise ValueError(f"Invalid date formate: '{date_str}'. Use the YYYY-MM-DD format.")
+        raise ValueError(f"Invalid date format: '{date_str}'. Use the YYYY-MM-DD format.")
 
 def create_data_dir():
+    """
+    Creates a directory for storing data if it does not already exist.
+    """
     os.makedirs(data_dir, exist_ok=True)
 
 def delete_data_dir():
+    """
+    Deletes the directory specified by the global variable `data_dir` if it exists.
+    """
     if data_dir.exists():
         shutil.rmtree(data_dir)
         print(f'Directory {data_dir} deleted.')
