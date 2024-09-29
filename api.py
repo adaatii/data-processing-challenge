@@ -71,9 +71,9 @@ def get_watershed_mean():
         etl.delete_data_dir()
 
     return jsonify({
-        'Date': start_date, 
-        'Mean precipitation on the day': prec_mean
-    }), 200 
+        'Date': start_date.strftime('%Y-%m-%d'), 
+        'Mean_precipitation': prec_mean
+        }), 200
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
