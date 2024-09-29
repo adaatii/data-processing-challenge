@@ -1,0 +1,8 @@
+services:
+  accumulated_prec:
+    build:
+      context: .
+      dockerfile: Dockerfile.prec
+      no_cache: true
+    volumes:
+      - ./output:/app/output

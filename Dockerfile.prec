@@ -1,9 +1,12 @@
-FROM python:3
+FROM python:3.12
 
-# Definir o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
-COPY . .
+COPY ./requirements.txt .
+
+COPY ./src .
+
+ENV PYTHONPATH=/app/src
 
 RUN mkdir -p ./output
 

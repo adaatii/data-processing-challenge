@@ -1,0 +1,11 @@
+services:
+  flask-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      no_cache: true
+    container_name: flask_api
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app  
