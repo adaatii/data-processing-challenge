@@ -16,7 +16,20 @@ The src folder contains the source code of the project, which is divided into
 - accumulate_precipitation.py: script that accumulated the precipitation data from MERGE/CPTEC.
 - api: contains the scripts responsible for the API.
 
-## How to run the project
+## API Endpoints
+
+#### GET /teste-tecnico/datas-limite
+```http://localhost:5000/teste-tecnico/datas-limite?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD```
+#### GET /teste-tecnico/media-bacia/obter
+```http://localhost:5000/teste-tecnico/media-bacia/obter?start_date=YYYY-MM-DD&watershed_name=XXXX```
+
+ - You can download the Postman collection [here](https://github.com/adaatii/data-processing-challenge/tree/main/postman)
+
+> [!WARNING]
+> Replace YYYY-MM-DD with the desired start and end dates. Also, replace XXXX with the desired watershed name.
+> The replacement must be done in the URL, in the docker-compose, and docker run commands.
+
+## Running the project
 
 ### Clone the repository
 
@@ -41,9 +54,6 @@ git clone git@github.com:adaatii/data-processing-challenge.git
 > [!NOTE]
 > The containers are running in the background, so to stop them, it is necessary to stop the container `docker stop {container}`
 > and remove the container `docker rm {container}` or stop and remove using Docker Desktop.
-
-> [!WARNING]
-> Replace YYYY-MM-DD with the desired start and end dates. Also, replace XXXX with the desired watershed name.
 
 There are two ways to run the project using Docker:
 
@@ -91,7 +101,7 @@ docker build -t flask_api -f Dockerfile.api .
 docker run -d -p 5000:5000 flask_api
 ```
 
-3. Manually running the project
+### Manually
 
 > [!NOTE]
 > To run the project manually, you must have Python 3.12 installed on your machine.
@@ -125,15 +135,3 @@ python3 accumulated_precipitation.py --start YYYY-MM-DD --end YYYY-MM-DD
 cd src/
 python3 api.py
 ```
-
-### API Endpoints
-
-#### GET /teste-tecnico/datas-limite
-```http://localhost:5000/teste-tecnico/datas-limite?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD```
-#### GET /teste-tecnico/media-bacia/obter
-```http://localhost:5000/teste-tecnico/media-bacia/obter?start_date=YYYY-MM-DD&watershed_name=XXXX```
-
- - You can download the Postman collection [here](https://github.com/adaatii/data-processing-challenge/tree/main/postman)
-
-
-

@@ -18,14 +18,17 @@ def get_prec_accumulated():
     """
     etl.create_data_dir()
 
-    try:
+    try:       
         start_date = etl.validate_date(request.args.get('start_date'))
         end_date = etl.validate_date(request.args.get('end_date'))
 
         if not start_date or not end_date:
             return jsonify({'error': 'The start_date and end_date parameters are mandatory'}), 400
 
-        start_date, end_date = etl.validate_date_range(start_date,end_date)
+        if end_date < start_date:
+            return jsonify({'error': 'The end_date cannot be earlier than the start_date'}), 400
+
+        start_date, end_date = etl.validate_date_range(start_date, end_date)
         etl.download_merge_files_by_hour(start_date,end_date)
         daily_accumulations = etl.calculate_daily_accumulations(start_date,end_date)
 
