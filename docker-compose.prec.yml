@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prec
-      no_cache: true
     container_name: accumulated_prec
     volumes:
       - ./output:/app/output
