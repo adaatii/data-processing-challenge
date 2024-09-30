@@ -12,9 +12,9 @@ this data available via API.
 
 The src folder contains the source code of the project, which is divided into
 
-- etl: contains the scripts responsible for extracting, transforming, and loading the data.
+- etl.py: contains the scripts responsible for extracting, transforming, and loading the data.
 - accumulate_precipitation.py: script that accumulated the precipitation data from MERGE/CPTEC.
-- api: contains the scripts responsible for the API.
+- api.py: contains the scripts responsible for the API.
 
 ## API Endpoints
 
@@ -31,6 +31,8 @@ The src folder contains the source code of the project, which is divided into
 
 > [!NOTE]
 > For the ```/teste-tecnico/datas-limite``` you can use theses dates to test the API: 2024-09-20 and 2024-09-24.
+
+> [!NOTE]
 > For the ```/teste-tecnico/media-bacia/obter``` you can use this date and watershed name to test the API: 2024-01-31 and the watershed name: 'xingu'.
 > You can check all the available watersheds [here](https://github.com/adaatii/data-processing-challenge/tree/main/contornos).
 
