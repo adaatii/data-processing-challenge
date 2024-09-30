@@ -8,11 +8,6 @@ to collect accumulated precipitation data from MERGE/CPTEC and provide daily
 accumulated precipitation data within a specified watershed. The project makes 
 this data available via API.
 
-## Libraries and Tools
-
-* 🐍 [Python](https://www.python.org/)
-* 🧪 [Flask](https://flask.palletsprojects.com/en/2.3.x/)
-
 ## Project Organization
 
 The src folder contains the source code of the project, which is divided into
