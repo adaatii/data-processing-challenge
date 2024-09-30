@@ -14,6 +14,7 @@ if __name__ == '__main__':
     end_date = args.end
     
     etl.create_data_dir()
+    etl.create_output_dir()
 
     try:
         start_date, end_date = etl.validate_date_range(start_date,end_date)

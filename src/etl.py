@@ -19,8 +19,8 @@ data_dir = Path('./data_merge')
 ftp_url = 'https://ftp.cptec.inpe.br/modelos/tempo/MERGE/GPM/HOURLY/'
 
 # Directory containing the countor files
-countor_path = './contornos'
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
+countor_path = os.path.join(BASE_DIR, '..', 'contornos') 
 
 def download_merge_files_by_hour(start_date, end_date):
     """
@@ -282,3 +282,9 @@ def delete_data_dir():
     if data_dir.exists():
         shutil.rmtree(data_dir)
         print(f'Directory {data_dir} deleted.')
+
+def create_output_dir():
+    """
+    Creates a directory for storing output files if it does not already exist.
+    """
+    os.makedirs('./output', exist_ok=True)

@@ -1,0 +1,71 @@
+{
+	"info": {
+		"_postman_id": "fb1f34c6-6dd1-40bd-9d87-f4778e45ecdb",
+		"name": "MEGE/CPTEC",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32598065"
+	},
+	"item": [
+		{
+			"name": "/teste-tecnico/datas-limite",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/teste-tecnico/datas-limite?start_date=2024-09-20&end_date=2024-09-24",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"teste-tecnico",
+						"datas-limite"
+					],
+					"query": [
+						{
+							"key": "start_date",
+							"value": "2024-09-20"
+						},
+						{
+							"key": "end_date",
+							"value": "2024-09-24"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/teste-tecnico/media-bacia/obter",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/teste-tecnico/media-bacia/obter?start_date=2024-01-31&watershed_name=xingu",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"teste-tecnico",
+						"media-bacia",
+						"obter"
+					],
+					"query": [
+						{
+							"key": "start_date",
+							"value": "2024-01-31"
+						},
+						{
+							"key": "watershed_name",
+							"value": "xingu"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

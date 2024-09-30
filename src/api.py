@@ -29,6 +29,9 @@ def get_prec_accumulated():
         etl.download_merge_files_by_hour(start_date,end_date)
         daily_accumulations = etl.calculate_daily_accumulations(start_date,end_date)
 
+        daily_accumulations['Start'] = daily_accumulations['Start'].dt.strftime('%Y-%m-%d')
+        daily_accumulations['End'] = daily_accumulations['End'].dt.strftime('%Y-%m-%d')
+
         start = daily_accumulations['Start'].tolist()
         end = daily_accumulations['End'].tolist()
         accumulation = daily_accumulations['Accumulated'].tolist()

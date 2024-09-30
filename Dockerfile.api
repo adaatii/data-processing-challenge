@@ -2,14 +2,14 @@ FROM python:3.12
 
 WORKDIR /app
 
-COPY ../requirements.txt .
+COPY ./requirements.txt .
 
 RUN pip install -r requirements.txt
 
-COPY ../src .
+COPY . .
 
 ENV PYTHONPATH=/app/src
-ENV FLASK_APP=src.api.py
+ENV FLASK_APP=api.py
 ENV FLASK_ENV=development
 
 EXPOSE 5000
