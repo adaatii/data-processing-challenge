@@ -29,6 +29,11 @@ The src folder contains the source code of the project, which is divided into
 > Replace YYYY-MM-DD with the desired start and end dates. Also, replace XXXX with the desired watershed name.
 > The replacement must be done in the URL, in the docker-compose, and docker run commands.
 
+> [!NOTE]
+> For the ```/teste-tecnico/datas-limite``` you can use theses dates to test the API: 2024-09-20 and 2024-09-24.
+> For the ```/teste-tecnico/media-bacia/obter``` you can use this date and watershed name to test the API: 2024-01-31 and the watershed name: 'xingu'.
+> You can check all the available watersheds [here](https://github.com/adaatii/data-processing-challenge/tree/main/contornos).
+
 ## Running the project
 
 ### Clone the repository
@@ -57,7 +62,7 @@ git clone git@github.com:adaatii/data-processing-challenge.git
 
 There are two ways to run the project using Docker:
 
-1. Executing the docker-compose file or building the image and running the container.
+#### 1. Executing the docker-compose file or building the image and running the container.
 
 #### docker-compose.prec.yml for Accumulated Precipitation
 
@@ -79,7 +84,7 @@ docker-compose -f docker-compose.api.yml build
 docker-compose -f docker-compose.api.yml up -d
 ```
 
-2. Building the image and running the container (Dockerfiles).
+#### 2. Building the image and running the container (Dockerfiles).
 
 #### Accumulated Precipitation
 
@@ -116,7 +121,6 @@ pip install -r requirements.txt
 
 Windows:
 ```bash
-cd Backend
 python3 -m venv .venv
 env\Scripts\activate.bat
 pip install -r requirements.txt
