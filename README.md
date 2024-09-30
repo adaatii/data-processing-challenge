@@ -93,6 +93,9 @@ docker run -d -p 5000:5000 flask_api
 
 3. Manually running the project
 
+> [!NOTE]
+> To run the project manually, you must have Python 3.12 installed on your machine.
+
 ### Preparing the environment
 Linux:
 ```bash
