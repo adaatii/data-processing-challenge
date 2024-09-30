@@ -12,28 +12,33 @@ this data available via API.
 
 The src folder contains the source code of the project, which is divided into
 
-- etl.py: contains the scripts responsible for extracting, transforming, and loading the data.
-- accumulate_precipitation.py: script that accumulated the precipitation data from MERGE/CPTEC.
-- api.py: contains the scripts responsible for the API.
+- **`etl.py`**: contains the scripts responsible for extracting, transforming, and loading the data.
+- **`accumulate_precipitation.py`**: script that accumulated the precipitation data from MERGE/CPTEC.
+- **`api.py`**: contains the scripts responsible for the API.
 
 ## API Endpoints
 
-#### GET /teste-tecnico/datas-limite
-```http://localhost:5000/teste-tecnico/datas-limite?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD```
-#### GET /teste-tecnico/media-bacia/obter
-```http://localhost:5000/teste-tecnico/media-bacia/obter?start_date=YYYY-MM-DD&watershed_name=XXXX```
+> [!NOTE]
+> You can download the Postman collection [here](https://github.com/adaatii/data-processing-challenge/tree/main/postman)
 
- - You can download the Postman collection [here](https://github.com/adaatii/data-processing-challenge/tree/main/postman)
+#### GET `/teste-tecnico/datas-limite`
+```http://localhost:5000/teste-tecnico/datas-limite?start_date=2024-09-26&end_date=2024-09-20```
+#### GET `/teste-tecnico/media-bacia/obter`
+```http://localhost:5000/teste-tecnico/media-bacia/obter?start_date=2024-01-31&watershed_name=xingu```
+
+ - **`start_date`**: YYYY-MM-DD (format)
+ - **`end_date`**: YYYY-MM-DD (format)
+ - **`watershed_name`**: watershed name (string)
 
 > [!WARNING]
-> Replace YYYY-MM-DD with the desired start and end dates. Also, replace XXXX with the desired watershed name.
-> The replacement must be done in the URL, in the docker-compose, and docker run commands.
+> 1. Replace YYYY-MM-DD with the desired start and end dates. Also, replace XXXX with the desired watershed name.
+>
+> 2. The replacement must be done in the URL, in the docker-compose, and docker run commands.
 
 > [!NOTE]
-> For the ```/teste-tecnico/datas-limite``` you can use theses dates to test the API: 2024-09-20 and 2024-09-24.
-
-> [!NOTE]
-> For the ```/teste-tecnico/media-bacia/obter``` you can use this date and watershed name to test the API: 2024-01-31 and the watershed name: 'xingu'.
+> 1. For the ```/teste-tecnico/datas-limite``` you can use theses dates to test the API: 2024-09-20 and 2024-09-24.
+>
+> 2. For the ```/teste-tecnico/media-bacia/obter``` you can use this date and watershed name to test the API: 2024-01-31 and the watershed name: 'xingu'.
 > You can check all the available watersheds [here](https://github.com/adaatii/data-processing-challenge/tree/main/contornos).
 
 ## Running the project
@@ -53,13 +58,11 @@ git clone git@github.com:adaatii/data-processing-challenge.git
 ### Docker
 
 > [!NOTE]
-> To run the project using Docker, you must have Docker installed on your machine.
-
-> [!NOTE]
-> The accumulated precipitation script takes some time to run, so it is recommended to wait a while to see the results.
-
-> [!NOTE]
-> The containers are running in the background, so to stop them, it is necessary to stop the container `docker stop {container}`
+> 1. To run the project using Docker, you must have Docker installed on your machine.
+>
+> 2. The accumulated precipitation script takes some time to run, so it is recommended to wait a while to see the results.
+>
+> 3. The containers are running in the background, so to stop them, it is necessary to stop the container `docker stop {container}`
 > and remove the container `docker rm {container}` or stop and remove using Docker Desktop.
 
 There are two ways to run the project using Docker:
@@ -124,7 +127,7 @@ pip install -r requirements.txt
 Windows:
 ```bash
 python3 -m venv .venv
-env\Scripts\activate.bat
+.venv\Scripts\activate.bat
 pip install -r requirements.txt
 ```
 
